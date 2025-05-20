@@ -1,0 +1,86 @@
+
+@layer base {
+  :root {
+    /* Peach Color Palette */
+    /* Generated based on #FFE0B2 as shade 300 */
+    --peach-50: #FFFBF2;
+    --peach-100: #FFF5E0;
+    --peach-200: #FFEACC;
+    --peach-300: #FFE0B2;
+    --peach-400: #FFD392;
+    --peach-500: #FFC270;
+    --peach-600: #FFB14E;
+    --peach-700: #FFA02C;
+    --peach-800: #FF8F0A;
+    --peach-900: #FF7C00;
+    --peach-950: #FF7000; /* Extra dark shade if needed */
+
+    /* Navy Color Palette */
+    /* Generated based on a conceptual "Navy text" color, e.g. #2C3E50 for shade 700 */
+    --navy-50: #F8F9F9;   /* Lighter than original for better contrast */
+    --navy-100: #EAECEE; /* Lighter than original */
+    --navy-200: #D5DBDB; /* Lighter than original */
+    --navy-300: #BDC3C7; /* Lighter than original */
+    --navy-400: #AAB7B8; /* Lighter than original */
+    --navy-500: #7F8C8D; /* Mid-tone */
+    --navy-600: #34495E; 
+    --navy-700: #2C3E50; /* Base for "Navy text" */
+    --navy-800: #212F3C;
+    --navy-900: #17202A;
+    --navy-950: #0C1216; /* Extra dark shade if needed */
+  }
+}
+
+/*
+  Note on Tailwind CSS Integration:
+  Defining these CSS variables alone does not automatically create Tailwind utility
+  classes like `bg-peach-500` or `text-navy-700`. For these classes to work,
+  your Tailwind CSS configuration (`tailwind.config.js`) must be extended to
+  include these custom colors, typically by mapping them from these CSS variables.
+
+  Example `tailwind.config.js` extension:
+  module.exports = {
+    theme: {
+      extend: {
+        colors: {
+          peach: {
+            50: 'var(--peach-50)',
+            100: 'var(--peach-100)',
+            200: 'var(--peach-200)',
+            300: 'var(--peach-300)',
+            400: 'var(--peach-400)',
+            500: 'var(--peach-500)',
+            600: 'var(--peach-600)',
+            700: 'var(--peach-700)',
+            800: 'var(--peach-800)',
+            900: 'var(--peach-900)',
+            950: 'var(--peach-950)',
+          },
+          navy: {
+            50: 'var(--navy-50)',
+            100: 'var(--navy-100)',
+            200: 'var(--navy-200)',
+            300: 'var(--navy-300)',
+            400: 'var(--navy-400)',
+            500: 'var(--navy-500)',
+            600: 'var(--navy-600)',
+            700: 'var(--navy-700)',
+            800: 'var(--navy-800)',
+            900: 'var(--navy-900)',
+            950: 'var(--navy-950)',
+          },
+        },
+      },
+    },
+    plugins: [],
+  };
+
+  If `reflex-tailwind` is installed (as suggested in rules.md), it might provide
+  a way to manage this configuration. Otherwise, Reflex's default Tailwind setup
+  needs to be customized, or a custom build process for Tailwind used.
+  This file primarily serves to provide the color definitions as CSS variables.
+  The `accent_color="mint"` in `rx.App(theme=...)` uses Radix's built-in "mint" scale,
+  which Reflex makes available to Tailwind. "sky" is a default Tailwind color.
+  This file focuses on "peach" and "navy" as they are custom and not covered by Radix accent or Tailwind defaults.
+*/
+

@@ -1,0 +1,39 @@
+
+```css
+/* Bubbles Animation */
+.bubble {
+  position: absolute; /* Changed to absolute for positioning within a relative/absolute parent */
+  background-color: rgba(224, 242, 254, 0.4); /* Tailwind sky-100 with transparency */
+  border-radius: 50%;
+  animation: floatUp 10s infinite ease-in-out;
+  pointer-events: none; 
+  z-index: -10; /* Ensure behind content */
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(0vh) translateX(0px) scale(0.8);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(-50vh) translateX(20px) scale(1.1);
+    opacity: 0.4;
+  }
+  90% {
+    opacity: 0.1;
+  }
+  100% {
+    transform: translateY(-100vh) translateX(-20px) scale(0.9);
+    opacity: 0;
+  }
+}
+
+/* Example of placeholder Lottie avatars if actual files are missing */
+/* This could be styled in LottiePlayer.py or globally if needed */
+/* For now, LottiePlayer handles missing files by showing text */
+
+```
+
