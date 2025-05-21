@@ -306,194 +306,193 @@ class AppState(rx.State):
         yield
 
     @rx.event
-    async def load_initial_data(self):
+    def load_initial_data(self):
         self.isLoading = True
-        async with self:
-            if not self.categories:
-                self.categories = [
-                    Category(
-                        id="cat1",
-                        name="Kindness",
-                        icon="🌟",
-                        background_class="bg-yellow-200/50",
+        if not self.categories:
+            self.categories = [
+                Category(
+                    id="cat1",
+                    name="Kindness",
+                    icon="🌟",
+                    background_class="bg-yellow-200/50",
+                ),
+                Category(
+                    id="cat2",
+                    name="Chores",
+                    icon="🧹",
+                    background_class="bg-blue-200/50",
+                ),
+                Category(
+                    id="cat3",
+                    name="Learning",
+                    icon="📚",
+                    background_class="bg-green-200/50",
+                ),
+                Category(
+                    id="cat4",
+                    name="Health",
+                    icon="💪",
+                    background_class="bg-red-200/50",
+                ),
+            ]
+        if not self.activities:
+            self.activities = [
+                Activity(
+                    id="act1",
+                    name="Helped a friend",
+                    category_id="cat1",
+                    icon="🤝",
+                    coins=15,
+                    parent_configurable=True,
+                ),
+                Activity(
+                    id="act2",
+                    name="Shared toys",
+                    category_id="cat1",
+                    icon="🎁",
+                    coins=10,
+                    parent_configurable=True,
+                ),
+                Activity(
+                    id="act3",
+                    name="Cleaned room",
+                    category_id="cat2",
+                    icon="🏠",
+                    coins=20,
+                    parent_configurable=True,
+                ),
+                Activity(
+                    id="act4",
+                    name="Set the table",
+                    category_id="cat2",
+                    icon="🍽️",
+                    coins=5,
+                    parent_configurable=True,
+                ),
+                Activity(
+                    id="act5",
+                    name="Read a book for 20 mins",
+                    category_id="cat3",
+                    icon="📖",
+                    coins=15,
+                    parent_configurable=False,
+                ),
+                Activity(
+                    id="act6",
+                    name="Practiced math",
+                    category_id="cat3",
+                    icon="🧮",
+                    coins=10,
+                    parent_configurable=False,
+                ),
+                Activity(
+                    id="act7",
+                    name="Ate all veggies",
+                    category_id="cat4",
+                    icon="🥦",
+                    coins=10,
+                    parent_configurable=True,
+                ),
+                Activity(
+                    id="act8",
+                    name="Played outside for 30 mins",
+                    category_id="cat4",
+                    icon="⚽",
+                    coins=15,
+                    parent_configurable=True,
+                ),
+            ]
+        if not self.children:
+            self.children = [
+                Child(
+                    id="child1",
+                    name="Alex",
+                    avatar_image_src="/avatars/tree/tree_stage_4.svg",
+                    avatar_lottie_src="/lottie/avatars/tree/stage_4.json",
+                    avatar_type="tree",
+                    growth_stage=3,
+                    coin_balance=150,
+                    current_streak_status="Day 3 Streak 🔥",
+                    current_goal_progress_percentage=50,
+                ),
+                Child(
+                    id="child2",
+                    name="Bella",
+                    avatar_image_src="/avatars/rocket/rocket_stage_8.svg",
+                    avatar_lottie_src="/lottie/avatars/rocket/stage_8.json",
+                    avatar_type="rocket",
+                    growth_stage=7,
+                    coin_balance=450,
+                    current_streak_status="Growing Strong! 🌱",
+                    current_goal_progress_percentage=50,
+                ),
+            ]
+        if not self.goals and self.children:
+            self.goals = [
+                Goal(
+                    id="goal1",
+                    child_id=self.children[0]["id"],
+                    description="Save for a new comic book",
+                    target_coins=300,
+                    is_achieved=False,
+                    real_world_reward_note="Comic book store visit!",
+                ),
+                Goal(
+                    id="goal2",
+                    child_id=(
+                        self.children[1]["id"]
+                        if len(self.children) > 1
+                        else self.children[0]["id"]
                     ),
-                    Category(
-                        id="cat2",
-                        name="Chores",
-                        icon="🧹",
-                        background_class="bg-blue-200/50",
+                    description="Fund a charity donation",
+                    target_coins=500,
+                    is_achieved=True,
+                    real_world_reward_note="Donated!",
+                ),
+            ]
+        if not self.history_entries and self.children:
+            self.history_entries = [
+                HistoryEntry(
+                    id="hist1",
+                    child_id=self.children[0]["id"],
+                    activity_name="Cleaned room",
+                    category_name="Chores",
+                    category_icon="🧹",
+                    coins_earned=20,
+                    timestamp=datetime.datetime.now(
+                        datetime.timezone.utc
+                    ).isoformat(),
+                ),
+                HistoryEntry(
+                    id="hist2",
+                    child_id=(
+                        self.children[1]["id"]
+                        if len(self.children) > 1
+                        else self.children[0]["id"]
                     ),
-                    Category(
-                        id="cat3",
-                        name="Learning",
-                        icon="📚",
-                        background_class="bg-green-200/50",
-                    ),
-                    Category(
-                        id="cat4",
-                        name="Health",
-                        icon="💪",
-                        background_class="bg-red-200/50",
-                    ),
-                ]
-            if not self.activities:
-                self.activities = [
-                    Activity(
-                        id="act1",
-                        name="Helped a friend",
-                        category_id="cat1",
-                        icon="🤝",
-                        coins=15,
-                        parent_configurable=True,
-                    ),
-                    Activity(
-                        id="act2",
-                        name="Shared toys",
-                        category_id="cat1",
-                        icon="🎁",
-                        coins=10,
-                        parent_configurable=True,
-                    ),
-                    Activity(
-                        id="act3",
-                        name="Cleaned room",
-                        category_id="cat2",
-                        icon="🏠",
-                        coins=20,
-                        parent_configurable=True,
-                    ),
-                    Activity(
-                        id="act4",
-                        name="Set the table",
-                        category_id="cat2",
-                        icon="🍽️",
-                        coins=5,
-                        parent_configurable=True,
-                    ),
-                    Activity(
-                        id="act5",
-                        name="Read a book for 20 mins",
-                        category_id="cat3",
-                        icon="📖",
-                        coins=15,
-                        parent_configurable=False,
-                    ),
-                    Activity(
-                        id="act6",
-                        name="Practiced math",
-                        category_id="cat3",
-                        icon="🧮",
-                        coins=10,
-                        parent_configurable=False,
-                    ),
-                    Activity(
-                        id="act7",
-                        name="Ate all veggies",
-                        category_id="cat4",
-                        icon="🥦",
-                        coins=10,
-                        parent_configurable=True,
-                    ),
-                    Activity(
-                        id="act8",
-                        name="Played outside for 30 mins",
-                        category_id="cat4",
-                        icon="⚽",
-                        coins=15,
-                        parent_configurable=True,
-                    ),
-                ]
-            if not self.children:
-                self.children = [
-                    Child(
-                        id="child1",
-                        name="Alex",
-                        avatar_image_src="/avatars/tree/tree_stage_4.svg",
-                        avatar_lottie_src="/lottie/avatars/tree/stage_4.json",
-                        avatar_type="tree",
-                        growth_stage=3,
-                        coin_balance=150,
-                        current_streak_status="Day 3 Streak 🔥",
-                        current_goal_progress_percentage=50,
-                    ),
-                    Child(
-                        id="child2",
-                        name="Bella",
-                        avatar_image_src="/avatars/rocket/rocket_stage_8.svg",
-                        avatar_lottie_src="/lottie/avatars/rocket/stage_8.json",
-                        avatar_type="rocket",
-                        growth_stage=7,
-                        coin_balance=450,
-                        current_streak_status="Growing Strong! 🌱",
-                        current_goal_progress_percentage=50,
-                    ),
-                ]
-            if not self.goals and self.children:
-                self.goals = [
-                    Goal(
-                        id="goal1",
-                        child_id=self.children[0]["id"],
-                        description="Save for a new comic book",
-                        target_coins=300,
-                        is_achieved=False,
-                        real_world_reward_note="Comic book store visit!",
-                    ),
-                    Goal(
-                        id="goal2",
-                        child_id=(
-                            self.children[1]["id"]
-                            if len(self.children) > 1
-                            else self.children[0]["id"]
-                        ),
-                        description="Fund a charity donation",
-                        target_coins=500,
-                        is_achieved=True,
-                        real_world_reward_note="Donated!",
-                    ),
-                ]
-            if not self.history_entries and self.children:
-                self.history_entries = [
-                    HistoryEntry(
-                        id="hist1",
-                        child_id=self.children[0]["id"],
-                        activity_name="Cleaned room",
-                        category_name="Chores",
-                        category_icon="🧹",
-                        coins_earned=20,
-                        timestamp=datetime.datetime.now(
+                    activity_name="Shared toys",
+                    category_name="Kindness",
+                    category_icon="🌟",
+                    coins_earned=10,
+                    timestamp=(
+                        datetime.datetime.now(
                             datetime.timezone.utc
-                        ).isoformat(),
-                    ),
-                    HistoryEntry(
-                        id="hist2",
-                        child_id=(
-                            self.children[1]["id"]
-                            if len(self.children) > 1
-                            else self.children[0]["id"]
-                        ),
-                        activity_name="Shared toys",
-                        category_name="Kindness",
-                        category_icon="🌟",
-                        coins_earned=10,
-                        timestamp=(
-                            datetime.datetime.now(
-                                datetime.timezone.utc
-                            )
-                            - datetime.timedelta(days=1)
-                        ).isoformat(),
-                    ),
-                ]
-            if (
-                not self.current_child_id_for_details
-                and self.children
-            ):
-                self.current_child_id_for_details = (
-                    self.children[0]["id"]
-                )
-            self.mascot_message = (
-                "Welcome back! Ready to earn some coins?"
+                        )
+                        - datetime.timedelta(days=1)
+                    ).isoformat(),
+                ),
+            ]
+        if (
+            not self.current_child_id_for_details
+            and self.children
+        ):
+            self.current_child_id_for_details = (
+                self.children[0]["id"]
             )
-            self.isLoading = False
+        self.mascot_message = (
+            "Welcome back! Ready to earn some coins?"
+        )
+        self.isLoading = False
         yield AppState.update_time_of_day
 
     @rx.event
@@ -871,7 +870,15 @@ class AppState(rx.State):
             self._reset_activity_log_state()
             if self.active_child_for_world_view_id:
                 self.current_view = "world_view"
-                self.mascot_message = f"Back to {self.active_child_for_world_view['name']}'s world!"
+                active_child = (
+                    self.active_child_for_world_view
+                )
+                if active_child:
+                    self.mascot_message = f"Back to {active_child['name']}'s world!"
+                else:
+                    self.mascot_message = (
+                        "Back to the world view!"
+                    )
             else:
                 self.current_view = "dashboard"
                 self.mascot_message = (
@@ -1028,13 +1035,11 @@ class AppState(rx.State):
         self.form_goal_description = ""
         self.form_goal_target_coins = 100
         self.form_goal_reward_note = ""
-        selected_child_name = next(
-            (
-                c["name"]
-                for c in self.children
-                if c["id"] == child_id
-            ),
-            "The child",
+        selected_child = self.selected_child_for_details
+        selected_child_name = (
+            selected_child["name"]
+            if selected_child
+            else "The child"
         )
         self.mascot_message = f"A new goal for {selected_child_name}! Exciting!"
         yield rx.toast.info(
@@ -1056,14 +1061,19 @@ class AppState(rx.State):
                 updated_goal = self.goals[goal_idx].copy()
                 updated_goal["is_achieved"] = True
                 self.goals[goal_idx] = updated_goal
-                child_name = next(
+                child_for_goal = next(
                     (
-                        c["name"]
+                        c
                         for c in self.children
                         if c["id"]
                         == updated_goal["child_id"]
                     ),
-                    "Someone",
+                    None,
+                )
+                child_name = (
+                    child_for_goal["name"]
+                    if child_for_goal
+                    else "Someone"
                 )
                 self.mascot_message = f"Hooray! {child_name} achieved goal: '{updated_goal['description']}'!"
                 yield rx.toast.success(
@@ -1088,8 +1098,9 @@ class AppState(rx.State):
         self, child_id: str | None
     ):
         self.current_child_id_for_details = child_id
-        if child_id and self.selected_child_for_details:
-            self.mascot_message = f"Viewing details for {self.selected_child_for_details['name']}."
+        selected_child = self.selected_child_for_details
+        if child_id and selected_child:
+            self.mascot_message = f"Viewing details for {selected_child['name']}."
         elif not child_id:
             self.mascot_message = (
                 "Select a child to see more."
