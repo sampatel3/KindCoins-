@@ -495,19 +495,21 @@ class AppState(rx.State):
         self.isLoading = False
         yield AppState.update_time_of_day
 
-    @rx.event
+    @rx.event(background=True)
     async def open_world_view(self, child_id: str):
-        self.active_child_for_world_view_id = child_id
-        self.world_view_animation_state = "entering"
-        self.current_view = "world_view"
+        async with self:
+            self.active_child_for_world_view_id = child_id
+            self.world_view_animation_state = "entering"
+            self.current_view = "world_view"
         await asyncio.sleep(0.05)
         async with self:
             self.world_view_animation_state = "entered"
         yield
 
-    @rx.event
+    @rx.event(background=True)
     async def close_world_view(self):
-        self.world_view_animation_state = "exiting"
+        async with self:
+            self.world_view_animation_state = "exiting"
         await asyncio.sleep(0.3)
         async with self:
             self.world_view_animation_state = "exited"
@@ -515,12 +517,13 @@ class AppState(rx.State):
             self.current_view = "dashboard"
         yield
 
-    @rx.event
+    @rx.event(background=True)
     async def open_activity_log_overlay(self):
-        self.activity_log_overlay_animation_state = (
-            "entering"
-        )
-        self.current_view = "activity_log_overlay"
+        async with self:
+            self.activity_log_overlay_animation_state = (
+                "entering"
+            )
+            self.current_view = "activity_log_overlay"
         await asyncio.sleep(0.05)
         async with self:
             self.activity_log_overlay_animation_state = (
@@ -528,11 +531,12 @@ class AppState(rx.State):
             )
         yield AppState.start_activity_logging
 
-    @rx.event
+    @rx.event(background=True)
     async def close_activity_log_overlay(self):
-        self.activity_log_overlay_animation_state = (
-            "exiting"
-        )
+        async with self:
+            self.activity_log_overlay_animation_state = (
+                "exiting"
+            )
         await asyncio.sleep(0.3)
         async with self:
             self.activity_log_overlay_animation_state = (
@@ -599,7 +603,7 @@ class AppState(rx.State):
             name, avatar_type=avatar_type
         )
 
-    @rx.event
+    @rx.event(background=True)
     async def perform_activity_logging(
         self,
         child_id: str,
@@ -614,11 +618,6 @@ class AppState(rx.State):
             ),
             None,
         )
-        if child_idx_to_update is None:
-            self.activity_logged_success_message = (
-                "Error: Child not found."
-            )
-            return
         activity_details = next(
             (
                 act
@@ -627,24 +626,34 @@ class AppState(rx.State):
             ),
             None,
         )
-        if not activity_details:
-            self.activity_logged_success_message = (
-                "Error: Activity not found."
+        category_details = None
+        if activity_details:
+            category_details = next(
+                (
+                    cat
+                    for cat in self.categories
+                    if cat["id"]
+                    == activity_details["category_id"]
+                ),
+                None,
             )
+        if child_idx_to_update is None:
+            async with self:
+                self.activity_logged_success_message = (
+                    "Error: Child not found."
+                )
             return
-        category_details = next(
-            (
-                cat
-                for cat in self.categories
-                if cat["id"]
-                == activity_details["category_id"]
-            ),
-            None,
-        )
+        if not activity_details:
+            async with self:
+                self.activity_logged_success_message = (
+                    "Error: Activity not found."
+                )
+            return
         if not category_details:
-            self.activity_logged_success_message = (
-                "Error: Category not found."
-            )
+            async with self:
+                self.activity_logged_success_message = (
+                    "Error: Category not found."
+                )
             return
         async with self:
             self.confirmed_activity_details = (
@@ -733,7 +742,7 @@ class AppState(rx.State):
             self.mascot_message = f"Super! {updated_child_data['name']} earned {coins_earned} coins!"
         yield AppState.clear_lottie_animations_after_delay
 
-    @rx.event
+    @rx.event(background=True)
     async def clear_lottie_animations_after_delay(self):
         await asyncio.sleep(2)
         async with self:
@@ -758,27 +767,33 @@ class AppState(rx.State):
         self.mascot_message = "Let's log something awesome!"
         yield
 
-    @rx.event
+    @rx.event(background=True)
     async def select_log_category(self, category_id: str):
-        self.selected_log_category_id = category_id
-        selected_cat = self.current_log_category
-        if selected_cat:
-            self.current_activity_log_bg_class = (
-                selected_cat["background_class"]
-            )
-            self.mascot_message = f"Great choice! What kind of {selected_cat['name']} deed?"
-        self.activity_log_step = "activity_select"
-        self.activity_panel_animation_state = "entering"
+        selected_cat = None
+        for cat in self.categories:
+            if cat["id"] == category_id:
+                selected_cat = cat
+                break
+        async with self:
+            self.selected_log_category_id = category_id
+            if selected_cat:
+                self.current_activity_log_bg_class = (
+                    selected_cat["background_class"]
+                )
+                self.mascot_message = f"Great choice! What kind of {selected_cat['name']} deed?"
+            self.activity_log_step = "activity_select"
+            self.activity_panel_animation_state = "entering"
         await asyncio.sleep(0.05)
         async with self:
             self.activity_panel_animation_state = "entered"
         yield
 
-    @rx.event
+    @rx.event(background=True)
     async def select_log_activity(self, activity_id: str):
-        self.selected_log_activity_id = activity_id
-        self.activity_log_step = "confirmation"
-        self.activity_panel_animation_state = "exiting"
+        async with self:
+            self.selected_log_activity_id = activity_id
+            self.activity_log_step = "confirmation"
+            self.activity_panel_animation_state = "exiting"
         await asyncio.sleep(0.3)
         async with self:
             self.activity_panel_animation_state = "exited"
@@ -793,30 +808,36 @@ class AppState(rx.State):
                     self.selected_log_activity_id,
                     current_activity["coins"],
                 )
-                self.mascot_message = (
-                    "Amazing! Look what you earned!"
-                )
-                self.confirmation_modal_animation_state = (
-                    "entering"
-                )
+                async with self:
+                    self.mascot_message = (
+                        "Amazing! Look what you earned!"
+                    )
+                    self.confirmation_modal_animation_state = (
+                        "entering"
+                    )
                 await asyncio.sleep(0.05)
                 async with self:
                     self.confirmation_modal_animation_state = (
                         "entered"
                     )
             else:
-                self.mascot_message = "Oh no, something went wrong selecting the activity."
-                self.activity_log_step = "activity_select"
+                async with self:
+                    self.mascot_message = "Oh no, something went wrong selecting the activity."
+                    self.activity_log_step = (
+                        "activity_select"
+                    )
         else:
-            self.mascot_message = (
-                "Hmm, child or activity is missing."
-            )
-            self.activity_log_step = "category_select"
+            async with self:
+                self.mascot_message = (
+                    "Hmm, child or activity is missing."
+                )
+                self.activity_log_step = "category_select"
         yield
 
-    @rx.event
+    @rx.event(background=True)
     async def close_activity_panel(self):
-        self.activity_panel_animation_state = "exiting"
+        async with self:
+            self.activity_panel_animation_state = "exiting"
         await asyncio.sleep(0.3)
         async with self:
             self.activity_panel_animation_state = "exited"
@@ -830,9 +851,12 @@ class AppState(rx.State):
             )
         yield
 
-    @rx.event
+    @rx.event(background=True)
     async def add_another_activity(self):
-        self.confirmation_modal_animation_state = "exiting"
+        async with self:
+            self.confirmation_modal_animation_state = (
+                "exiting"
+            )
         await asyncio.sleep(0.3)
         async with self:
             self.confirmation_modal_animation_state = (
@@ -845,23 +869,25 @@ class AppState(rx.State):
             )
         yield
 
-    @rx.event
+    @rx.event(background=True)
     async def return_to_origin_view(self):
         if self.confirmation_modal_animation_state in [
             "entering",
             "entered",
         ]:
-            self.confirmation_modal_animation_state = (
-                "exiting"
-            )
+            async with self:
+                self.confirmation_modal_animation_state = (
+                    "exiting"
+                )
             await asyncio.sleep(0.3)
             async with self:
                 self.confirmation_modal_animation_state = (
                     "exited"
                 )
-        self.activity_log_overlay_animation_state = (
-            "exiting"
-        )
+        async with self:
+            self.activity_log_overlay_animation_state = (
+                "exiting"
+            )
         await asyncio.sleep(0.3)
         async with self:
             self.activity_log_overlay_animation_state = (
@@ -886,10 +912,11 @@ class AppState(rx.State):
                 )
         yield
 
-    @rx.event
+    @rx.event(background=True)
     async def start_custom_activity_creation(self):
         if not self.selected_log_category_id:
-            self.mascot_message = "First, pick a category for your new activity!"
+            async with self:
+                self.mascot_message = "First, pick a category for your new activity!"
             yield rx.toast.error(
                 "Please select a category first."
             )
@@ -898,7 +925,10 @@ class AppState(rx.State):
             "entering",
             "entered",
         ]:
-            self.activity_panel_animation_state = "exiting"
+            async with self:
+                self.activity_panel_animation_state = (
+                    "exiting"
+                )
             await asyncio.sleep(0.3)
             async with self:
                 self.activity_panel_animation_state = (
@@ -924,7 +954,7 @@ class AppState(rx.State):
             )
         yield
 
-    @rx.event
+    @rx.event(background=True)
     async def save_custom_activity(self):
         if not self.custom_activity_name_input.strip():
             yield rx.window_alert(
@@ -933,9 +963,10 @@ class AppState(rx.State):
             return
         if not self.selected_log_category_id:
             yield rx.window_alert("Category not selected.")
-            self.custom_activity_modal_animation_state = (
-                "exiting"
-            )
+            async with self:
+                self.custom_activity_modal_animation_state = (
+                    "exiting"
+                )
             await asyncio.sleep(0.3)
             async with self:
                 self.custom_activity_modal_animation_state = (
@@ -954,10 +985,11 @@ class AppState(rx.State):
             coins=self.custom_activity_coins_slider_value,
             parent_configurable=True,
         )
-        self.activities.append(new_activity)
-        self.custom_activity_modal_animation_state = (
-            "exiting"
-        )
+        async with self:
+            self.activities.append(new_activity)
+            self.custom_activity_modal_animation_state = (
+                "exiting"
+            )
         await asyncio.sleep(0.3)
         async with self:
             self.custom_activity_modal_animation_state = (
@@ -966,11 +998,12 @@ class AppState(rx.State):
             self.mascot_message = f"'{new_activity['name']}' added! Now let's log it."
         yield AppState.select_log_activity(new_activity_id)
 
-    @rx.event
+    @rx.event(background=True)
     async def cancel_custom_activity_creation(self):
-        self.custom_activity_modal_animation_state = (
-            "exiting"
-        )
+        async with self:
+            self.custom_activity_modal_animation_state = (
+                "exiting"
+            )
         await asyncio.sleep(0.3)
         async with self:
             self.custom_activity_modal_animation_state = (
