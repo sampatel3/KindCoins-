@@ -22,8 +22,10 @@ def floating_element(
                 "height": f"{size}px",
                 "left": f"{left_pos}%",
                 "animation_duration": f"{duration}s",
-            },
-            class_name="bubble",
+                "background_color": "rgba(224, 242, 254, 0.4)",
+                "border_radius": "50%",
+                "pointer_events": "none",
+            }
         )
     elif element_type == "leaf":
         size_w = random.randint(15, 25)
@@ -41,8 +43,9 @@ def floating_element(
                 "animation_duration": f"{duration}s",
                 "--sway-x": f"{sway_x}px",
                 "--sway-rotate": f"{sway_rotate}deg",
-            },
-            class_name="floating-leaf",
+                "background_color": "rgba(134, 239, 172, 0.5)",
+                "clip_path": "ellipse(50% 40% at 50% 50%)",
+            }
         )
     elif element_type == "star":
         top_pos = random.randint(5, 70)
@@ -59,15 +62,18 @@ def floating_element(
                 "animation_duration": f"{duration}s",
                 "animation_delay": f"{random.uniform(0, 4)}s",
                 "z_index": -10,
-            },
-            class_name="twinkling-star",
+                "background_color": "rgba(251, 191, 36, 0.8)",
+                "border_radius": "50%",
+            }
         )
     return rx.fragment()
 
 
 def floating_animations_component() -> rx.Component:
     """
-    Creates a variety of floating animations for the background.
+    Creates a variety of floating elements for the background.
+    Animations that were previously in animations.css are now removed.
+    The elements will appear but will be static or rely on future inline animation styles if added.
     """
     num_bubbles = 7
     num_leaves = 5

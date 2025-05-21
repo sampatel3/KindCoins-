@@ -7,7 +7,7 @@ from app.pages.login import login_page
 
 app = rx.App(
     theme=rx.theme(appearance="light"),
-    stylesheets=["/tailwind_colors.css", "/animations.css"],
+    stylesheets=["/tailwind_colors.css"],
 )
 app.add_page(
     index_page, route="/", title="KindCoins Dashboard"
